@@ -3,92 +3,85 @@ import pandas as pd
 from datetime import datetime, timedelta
 import os
 
-# 1. Configuração de Alta Performance
-st.set_page_config(
-    page_title="PNI 2026 | Gestão Profissional",
-    page_icon="💉",
-    layout="wide"
-)
+# 1. Configurações de Sistema
+st.set_page_config(page_title="PNI Elite 2026", layout="wide", page_icon="💉")
 
-# 2. CSS DE ALTO NÍVEL (Design limpo, contraste máximo e tipografia séria)
+# 2. CSS Master (Design Moderno, Botões Flutuantes e Letras Ultra Visíveis)
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
-    /* Reset Geral */
+    /* Reset e Fundo */
     html, body, [class*="st-"] {
-        font-family: 'Roboto', sans-serif;
-        color: #1e293b !important;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #000000 !important;
     }
+    .main { background-color: #f8fafc; }
 
-    /* Estilização da Barra Lateral */
-    [data-testid="stSidebar"] {
-        background-color: #f1f5f9 !important;
-        border-right: 1px solid #e2e8f0;
-    }
-    [data-testid="stSidebar"] .stMarkdown p, label {
-        color: #0f172a !important;
-        font-weight: 600 !important;
+    /* Barra Lateral - Contraste Máximo */
+    [data-testid="stSidebar"] { background-color: #ffffff !important; border-right: 2px solid #e2e8f0; }
+    [data-testid="stSidebar"] .stMarkdown p, label, .stRadio label {
+        color: #000000 !important;
+        font-weight: 800 !important;
         font-size: 15px !important;
     }
 
-    /* Título do Dashboard */
-    .dashboard-header {
-        background-color: #0f172a;
+    /* Cabeçalho Moderno */
+    .hero-section {
+        background: linear-gradient(135deg, #013A71 0%, #001d3d 100%);
         padding: 40px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-        color: white !important;
+        border-radius: 20px;
+        color: white;
         text-align: center;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-    .dashboard-header h1 {
-        color: #f8fafc !important;
-        font-weight: 700;
-        letter-spacing: -1px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
-    /* Cards de Informação Técnica */
-    .info-card {
-        background-color: #ffffff;
-        padding: 30px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Cartões de Informação Técnica */
+    .tech-card {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         margin-bottom: 20px;
     }
-    .info-card h3 {
-        color: #2563eb !important;
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 15px;
-        margin-bottom: 20px;
-    }
-    .data-row {
+    .tech-item {
         display: flex;
         justify-content: space-between;
         padding: 12px 0;
-        border-bottom: 1px solid #f8fafc;
+        border-bottom: 1px solid #f1f5f9;
     }
-    .label-tech { font-weight: 700; color: #64748b; }
-    .value-tech { font-weight: 700; color: #0f172a; }
+    .tech-label { color: #475569; font-weight: 600; }
+    .tech-value { color: #000000; font-weight: 800; }
 
-    /* Estilo de Sucesso e Erro (Inativada vs Atenuada) */
-    .stAlert {
-        border-radius: 8px !important;
-        border: none !important;
+    /* Botão Moderno */
+    .stButton > button {
+        width: 100%;
+        background: #013A71;
+        color: white !important;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 800;
+        transition: all 0.3s;
+    }
+    .stButton > button:hover {
+        background: #00B4D8;
+        transform: scale(1.02);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Cabeçalho de Comando
+# 3. Banner Principal
 st.markdown("""
-    <div class="dashboard-header">
-        <h1>GESTÃO DE IMUNIZAÇÃO PNI 2026</h1>
-        <p style="color: #94a3b8;">SISTEMA TÉCNICO DE APOIO À DECISÃO CLÍNICA</p>
+    <div class="hero-section">
+        <h1 style="color: white; margin:0;">SISTEMA DE IMUNIZAÇÃO PROFISSIONAL 2026</h1>
+        <p style="color: #00B4D8; font-size: 18px; font-weight:600;">Controle de Protocolos e Aprazamento</p>
     </div>
     """, unsafe_allow_html=True)
 
-# 4. Banco de Dados (Mantendo a integridade total solicitada)
+# 4. BANCO DE DADOS INTEGRAL (TODAS AS VACINAS DE VOLTA)
 DADOS_PNI = {
     "CALENDÁRIO INFANTIL (0-12 meses)": {
         "BCG": {"via": "ID", "local": "Deltoide Direito", "agulha": "13 x 0,45mm", "doses": ["Dose Única"], "ret": 0, "tipo": "ATENUADA"},
@@ -106,68 +99,65 @@ DADOS_PNI = {
         "TRÍPLICE VIRAL (SCR)": {"via": "SC", "local": "Deltoide Esq.", "agulha": "13 x 0,45mm", "doses": ["12 meses", "15 meses"], "ret": 90, "tipo": "ATENUADA"},
         "VARICELA": {"via": "SC", "local": "Deltoide Esq.", "agulha": "13 x 0,45mm", "doses": ["15 meses", "4 anos"], "ret": 1095, "tipo": "ATENUADA"}
     },
-    "CALENDÁRIO ADULTO": {
+    "CALENDÁRIO ADULTO E ADOLESCENTE": {
         "HPV QUADRIVALENTE": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única (9-14 anos)"], "ret": 0, "tipo": "INATIVADA"},
         "MENINGO ACWY": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única (11-14 anos)"], "ret": 0, "tipo": "INATIVADA"},
         "dT (DUPLA ADULTO)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Reforço a cada 10 anos"], "ret": 3650, "tipo": "INATIVADA"},
-        "PNEUMO 23V": {"via": "IM/SC", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única"], "ret": 1825, "tipo": "INATIVADA"}
+        "PNEUMO 23V": {"via": "IM/SC", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única (Idosos/Acamados)"], "ret": 1825, "tipo": "INATIVADA"}
     },
     "CALENDÁRIO GESTANTES": {
         "VSR (ABRYSVO)": {"via": "IM Profunda", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["24ª a 36ª semana"], "ret": 0, "tipo": "INATIVADA"},
-        "dTpa": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["A partir da 20ª semana"], "ret": 0, "tipo": "INATIVADA"}
+        "dTpa (ACELULAR)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["A partir da 20ª semana"], "ret": 0, "tipo": "INATIVADA"},
+        "HEPATITE B (GESTANTE)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Conforme histórico"], "ret": 30, "tipo": "INATIVADA"}
     },
     "CAMPANHAS SAZONAIS": {
-        "INFLUENZA": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Anual"], "ret": 365, "tipo": "INATIVADA"},
-        "DENGUE": {"via": "SC", "local": "Deltoide", "agulha": "13 x 0,45mm", "doses": ["1ª Dose", "2ª Dose"], "ret": 90, "tipo": "ATENUADA"},
+        "INFLUENZA (GRIPE)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Anual"], "ret": 365, "tipo": "INATIVADA"},
+        "DENGUE (QDENGA)": {"via": "SC", "local": "Deltoide", "agulha": "13 x 0,45mm", "doses": ["1ª Dose", "2ª Dose"], "ret": 90, "tipo": "ATENUADA"},
         "COVID-19 XBB": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Anual"], "ret": 365, "tipo": "INATIVADA"}
     }
 }
 
-# 5. Menu Lateral
-st.sidebar.markdown("### 🛠️ CONFIGURAÇÃO DO ATENDIMENTO")
-cat_sel = st.sidebar.selectbox("CATEGORIA", list(DADOS_PNI.keys()))
-vax_sel = st.sidebar.radio("IMUNOBIOLÓGICO", list(DADOS_PNI[cat_sel].keys()))
-v_info = DADOS_PNI[cat_sel][vax_sel]
+# 5. Barra Lateral
+with st.sidebar:
+    st.markdown("### 📋 SELEÇÃO TÉCNICA")
+    cat = st.selectbox("GRUPO:", list(DADOS_PNI.keys()))
+    vax = st.radio("VACINA:", list(DADOS_PNI[cat].keys()))
+    v_info = DADOS_PNI[cat][vax]
 
-# 6. Painel Principal (Grid Layout)
-col_dados, col_form = st.columns([1.5, 1], gap="large")
+# 6. Painel Principal
+col_info, col_reg = st.columns([1.5, 1], gap="large")
 
-with col_dados:
-    st.subheader(f"🔍 Protocolo Clínico: {vax_sel}")
+with col_info:
+    st.markdown(f"### 🛡️ Protocolo: {vax}")
     
-    # Status de Tipo
+    # Badge de Tipo
     if v_info["tipo"] == "ATENUADA":
-        st.error(f"**ALERTA:** Vacina de Agente Etiológico VIVO (Atenuada)")
+        st.error(f"**ATENÇÃO:** {v_info['tipo']} (Vírus/Bactéria Vivo)")
     else:
-        st.success(f"**STATUS:** Vacina de Agente INATIVADO")
+        st.success(f"**TIPO:** {v_info['tipo']} (Inativada)")
 
-    # Card com informações tabuladas
     st.markdown(f"""
-        <div class="info-card">
-            <h3>Especificações de Administração</h3>
-            <div class="data-row"><span class="label-tech">VIA DE ADMINISTRAÇÃO</span><span class="value-tech">{v_info['via']}</span></div>
-            <div class="data-row"><span class="label-tech">LOCAL DE ELEIÇÃO</span><span class="value-tech">{v_info['local']}</span></div>
-            <div class="data-row"><span class="label-tech">AGULHA RECOMENDADA</span><span class="value-tech">{v_info['agulha']}</span></div>
-            <div class="data-row"><span class="label-tech">INTERVALO PARA RETORNO</span><span class="value-tech">{v_info['ret']} dias</span></div>
-        </div>
+    <div class="tech-card">
+        <div class="tech-item"><span class="tech-label">VIA</span><span class="tech-value">{v_info['via']}</span></div>
+        <div class="tech-item"><span class="tech-label">LOCAL</span><span class="tech-value">{v_info['local']}</span></div>
+        <div class="tech-item"><span class="tech-label">AGULHA</span><span class="tech-value">{v_info['agulha']}</span></div>
+        <div class="tech-item" style="border:none;"><span class="tech-label">RETORNO</span><span class="tech-value">{v_info['ret']} dias</span></div>
+    </div>
     """, unsafe_allow_html=True)
-    
-    
 
-with col_form:
-    st.subheader("📋 Registro de Dose")
-    with st.container():
-        nome = st.text_input("IDENTIFICAÇÃO DO PACIENTE").upper()
-        dose = st.selectbox("DOSE DO ESQUEMA", v_info["doses"])
-        
-        if st.button("CONFIRMAR E GERAR APRAZAMENTO", use_container_width=True):
-            if nome:
-                retorno = (datetime.now() + timedelta(days=v_info['ret'])).strftime("%d/%m/%Y") if v_info['ret'] > 0 else "CONCLUÍDO"
-                st.info(f"**Registro de Atendimento Confirmado**")
-                st.write(f"Paciente: **{nome}**")
-                st.write(f"Data de Retorno: **{retorno}**")
-            else:
-                st.warning("⚠️ Nome do paciente é obrigatório para o registro.")
+with col_reg:
+    st.markdown("### ✍️ Atendimento")
+    nome = st.text_input("NOME DO PACIENTE").upper()
+    dose = st.selectbox("DOSE SELECIONADA", v_info["doses"])
+    
+    if st.button("REGISTRAR ATENDIMENTO"):
+        if nome:
+            retorno = (datetime.now() + timedelta(days=v_info['ret'])).strftime("%d/%m/%Y") if v_info['ret'] > 0 else "DOSE ÚNICA"
+            st.info(f"✅ **REGISTRADO COM SUCESSO**")
+            st.write(f"Paciente: **{nome}**")
+            st.write(f"Próxima Visita: **{retorno}**")
+        else:
+            st.warning("⚠️ Digite o nome do paciente.")
 
 st.markdown("---")
-st.caption("Documento Técnico PNI 2026 | Desenvolvido para Alta Performance em Sala de Vacina")
+st.caption("PNI Master 2026 • Design Profissional de Alto Contraste • Versão Integral")
