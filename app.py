@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. CSS Avançado para Design Institucional
+# 2. CSS REVISADO: CORES TOTAIS (Força visibilidade em fundo claro)
 st.markdown("""
     <style>
     /* Importação de fonte moderna */
@@ -18,9 +18,10 @@ st.markdown("""
 
     html, body, [class*="st-"] {
         font-family: 'Inter', sans-serif;
+        color: #1E293B !important; /* Azul acinzentado escuro para todo o texto */
     }
 
-    /* Cabeçalho Superior Estilizado */
+    /* Cabeçalho Superior */
     .header-container {
         background: linear-gradient(135deg, #013A71 0%, #0259AB 100%);
         padding: 40px 20px;
@@ -33,50 +34,49 @@ st.markdown("""
     .header-title {
         color: white !important;
         font-weight: 800;
-        font-size: 38px;
+        font-size: 35px;
         text-transform: uppercase;
-        letter-spacing: -1px;
         margin: 0;
     }
     .header-subtitle {
-        color: #E0E0E0;
+        color: #D1D5DB !important;
         font-size: 16px;
         margin-top: 10px;
-        font-weight: 400;
-        letter-spacing: 1px;
     }
 
-    /* Estilização dos Cards Técnicos */
+    /* Cards Técnicos (Fundo Branco, Letras Escuras) */
     .vax-card {
         background-color: #FFFFFF !important;
         padding: 30px;
         border-radius: 12px;
         border-left: 8px solid #013A71;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         margin-bottom: 25px;
     }
     .vax-card h3 { 
         color: #013A71 !important; 
         font-weight: 700;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #E2E8F0;
         padding-bottom: 10px;
     }
-    .vax-card p { 
-        font-size: 16px; 
-        line-height: 1.6;
-        color: #333333 !important;
-        margin: 10px 0;
-    }
-    .vax-card b { 
-        color: #013A71; 
-        font-weight: 700;
+    .vax-card p, .vax-card b, .vax-card span { 
+        color: #1E293B !important; 
     }
 
-    /* Ajustes da Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: #f8fafc;
-        border-right: 1px solid #e2e8f0;
+    /* BARRA LATERAL (Correção de cores das letras) */
+    section[data-testid="stSidebar"] {
+        background-color: #F8FAFC !important;
+    }
+    section[data-testid="stSidebar"] .stMarkdown p, 
+    section[data-testid="stSidebar"] label, 
+    section[data-testid="stSidebar"] span {
+        color: #0F172A !important; /* Azul quase preto para legibilidade total */
+        font-weight: 600 !important;
+    }
+
+    /* Inputs e Selectboxes (Garantir texto escuro) */
+    .stSelectbox div, .stTextInput input, .stRadio label {
+        color: #1E293B !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -85,7 +85,7 @@ st.markdown("""
 st.markdown("""
     <div class="header-container">
         <p class="header-title">SISTEMA DE IMUNIZAÇÃO PROFISSIONAL</p>
-        <p class="header-subtitle">PROGRAMA NACIONAL DE IMUNIZAÇÃO • ATUALIZAÇÃO GOVERNAMENTAL 2026</p>
+        <p class="header-subtitle">PROGRAMA NACIONAL DE IMUNIZAÇÃO • ATUALIZAÇÃO 2026</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -125,16 +125,17 @@ DADOS_PNI = {
     }
 }
 
-# 5. Lógica da Interface
+# 5. Barra Lateral
 st.sidebar.markdown("### ⚙️ PARÂMETROS TÉCNICOS")
 cat_sel = st.sidebar.selectbox("CATEGORIA ALVO:", list(DADOS_PNI.keys()))
 vax_sel = st.sidebar.radio("IMUNOBIOLÓGICO:", list(DADOS_PNI[cat_sel].keys()))
 v_info = DADOS_PNI[cat_sel][vax_sel]
 
+# 6. Layout Principal
 col1, col2 = st.columns([1.6, 1])
 
 with col1:
-    st.markdown(f"#### Especificação de Protocolo: **{vax_sel}**")
+    st.markdown(f"#### Protocolo Selecionado: **{vax_sel}**")
     
     if v_info["tipo"] == "ATENUADA":
         st.error(f"☢️ **TIPO:** {v_info['tipo']} (Vírus/Bactéria Vivo)")
@@ -152,23 +153,17 @@ with col1:
     """, unsafe_allow_html=True)
 
 with col2:
-    st.markdown("#### 👤 Atendimento")
-    with st.container():
-        nome = st.text_input("NOME DO PACIENTE:").upper()
-        dose = st.selectbox("DOSE DO ESQUEMA:", v_info["doses"])
-        
-        if st.button("🚀 REGISTRAR E APRAZAR"):
-            if nome:
-                retorno = (datetime.now() + timedelta(days=v_info['ret'])).strftime("%d/%m/%Y") if v_info['ret'] > 0 else "CONCLUÍDO"
-                st.info("✅ Registro processado com sucesso.")
-                st.markdown(f"""
-                ---
-                **Paciente:** {nome}  
-                **Status:** {dose} aplicada  
-                **Próximo Retorno:** `{retorno}`
-                """)
-            else:
-                st.error("⚠️ Identificação obrigatória.")
+    st.markdown("#### 👤 Registro de Atendimento")
+    nome = st.text_input("NOME DO PACIENTE:").upper()
+    dose = st.selectbox("DOSE DO ESQUEMA:", v_info["doses"])
+    
+    if st.button("🚀 REGISTRAR E APRAZAR"):
+        if nome:
+            retorno = (datetime.now() + timedelta(days=v_info['ret'])).strftime("%d/%m/%Y") if v_info['ret'] > 0 else "CONCLUÍDO"
+            st.info("✅ Registro processado com sucesso.")
+            st.markdown(f"**Paciente:** {nome}  \n**Dose:** {dose}  \n**Retorno:** `{retorno}`")
+        else:
+            st.error("⚠️ Identificação obrigatória.")
 
 st.markdown("---")
-st.caption("Base normativa atualizada • Ministério da Saúde 2026")
+st.caption("Sistema Master v6.0 • PNI 2026 • Design Profissional de Alto Contraste")
