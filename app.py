@@ -3,34 +3,93 @@ import pandas as pd
 from datetime import datetime, timedelta
 import os
 
-# Configuração da Página
-st.set_page_config(page_title="SISTEMA VACINADOR PROFISSIONAL 2026", layout="wide")
+# 1. Configuração da Página
+st.set_page_config(
+    page_title="PNI 2026 | Gestão de Imunização",
+    page_icon="💉",
+    layout="wide"
+)
 
-# CSS para garantir legibilidade e visual técnico
+# 2. CSS Avançado para Design Institucional
 st.markdown("""
     <style>
+    /* Importação de fonte moderna */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+
+    html, body, [class*="st-"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Cabeçalho Superior Estilizado */
+    .header-container {
+        background: linear-gradient(135deg, #013A71 0%, #0259AB 100%);
+        padding: 40px 20px;
+        border-radius: 15px;
+        margin-bottom: 35px;
+        box-shadow: 0 10px 25px rgba(1, 58, 113, 0.2);
+        text-align: center;
+        border-bottom: 4px solid #00B4D8;
+    }
+    .header-title {
+        color: white !important;
+        font-weight: 800;
+        font-size: 38px;
+        text-transform: uppercase;
+        letter-spacing: -1px;
+        margin: 0;
+    }
+    .header-subtitle {
+        color: #E0E0E0;
+        font-size: 16px;
+        margin-top: 10px;
+        font-weight: 400;
+        letter-spacing: 1px;
+    }
+
+    /* Estilização dos Cards Técnicos */
     .vax-card {
         background-color: #FFFFFF !important;
-        color: #1A1A1A !important;
-        padding: 25px;
-        border-radius: 8px;
-        border: 1px solid #BDBDBD;
-        margin-bottom: 20px;
-        box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
+        padding: 30px;
+        border-radius: 12px;
+        border-left: 8px solid #013A71;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
     }
-    .vax-card h3, .vax-card p, .vax-card b {
-        color: #1A1A1A !important;
-    }
-    .main-title { 
+    .vax-card h3 { 
         color: #013A71 !important; 
-        text-align: center; 
-        font-weight: bold;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 700;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+    .vax-card p { 
+        font-size: 16px; 
+        line-height: 1.6;
+        color: #333333 !important;
+        margin: 10px 0;
+    }
+    .vax-card b { 
+        color: #013A71; 
+        font-weight: 700;
+    }
+
+    /* Ajustes da Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #f8fafc;
+        border-right: 1px solid #e2e8f0;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# BANCO DE DADOS INTEGRAL 2026
+# 3. Cabeçalho Visual
+st.markdown("""
+    <div class="header-container">
+        <p class="header-title">SISTEMA DE IMUNIZAÇÃO PROFISSIONAL</p>
+        <p class="header-subtitle">PROGRAMA NACIONAL DE IMUNIZAÇÃO • ATUALIZAÇÃO GOVERNAMENTAL 2026</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# 4. Banco de Dados Integral 2026
 DADOS_PNI = {
     "CALENDÁRIO INFANTIL (0-12 meses)": {
         "BCG": {"via": "ID", "local": "Deltoide Direito", "agulha": "13 x 0,45mm", "doses": ["Dose Única"], "ret": 0, "tipo": "ATENUADA"},
@@ -66,45 +125,50 @@ DADOS_PNI = {
     }
 }
 
-st.markdown('<h1 class="main-title">SISTEMA DE IMUNIZAÇÃO PROFISSIONAL - PNI 2026</h1>', unsafe_allow_html=True)
-
-# Lógica da Interface
-st.sidebar.header("CONTROLE TÉCNICO")
-cat_sel = st.sidebar.selectbox("CATEGORIA:", list(DADOS_PNI.keys()))
-vax_sel = st.sidebar.radio("VACINA:", list(DADOS_PNI[cat_sel].keys()))
+# 5. Lógica da Interface
+st.sidebar.markdown("### ⚙️ PARÂMETROS TÉCNICOS")
+cat_sel = st.sidebar.selectbox("CATEGORIA ALVO:", list(DADOS_PNI.keys()))
+vax_sel = st.sidebar.radio("IMUNOBIOLÓGICO:", list(DADOS_PNI[cat_sel].keys()))
 v_info = DADOS_PNI[cat_sel][vax_sel]
 
-col1, col2 = st.columns([1.5, 1])
+col1, col2 = st.columns([1.6, 1])
 
 with col1:
-    st.subheader(f"Especificação: {vax_sel}")
+    st.markdown(f"#### Especificação de Protocolo: **{vax_sel}**")
+    
     if v_info["tipo"] == "ATENUADA":
-        st.error(f"TIPO: {v_info['tipo']} (Vírus/Bactéria Vivo)")
+        st.error(f"☢️ **TIPO:** {v_info['tipo']} (Vírus/Bactéria Vivo)")
     else:
-        st.success(f"TIPO: {v_info['tipo']} (Inativada/Fragmentada)")
+        st.success(f"🛡️ **TIPO:** {v_info['tipo']} (Inativada/Fragmentada)")
 
     st.markdown(f"""
         <div class="vax-card">
-            <h3 style="margin-top:0;">Orientações de Administração</h3>
+            <h3>📖 Orientações de Administração</h3>
             <p><b>📍 LOCAL DE APLICAÇÃO:</b> {v_info['local']}</p>
             <p><b>📏 CALIBRE DE AGULHA:</b> {v_info['agulha']}</p>
-            <p><b>💉 VIA:</b> {v_info['via']}</p>
+            <p><b>💉 VIA DE ADMINISTRAÇÃO:</b> {v_info['via']}</p>
             <p><b>🗓️ PRAZO PARA RETORNO:</b> {v_info['ret']} dias</p>
         </div>
     """, unsafe_allow_html=True)
 
 with col2:
-    st.subheader("Registro de Atendimento")
-    nome = st.text_input("NOME DO PACIENTE (Letras Maiúsculas):").upper()
-    dose = st.selectbox("DOSE SELECIONADA:", v_info["doses"])
-    if st.button("REGISTRAR E CALCULAR RETORNO"):
-        if nome:
-            retorno = (datetime.now() + timedelta(days=v_info['ret'])).strftime("%d/%m/%Y") if v_info['ret'] > 0 else "CONCLUÍDO / DOSE ÚNICA"
-            st.info(f"REGISTRO EFETUADO COM SUCESSO")
-            st.write(f"Paciente: **{nome}**")
-            st.write(f"Próximo Retorno: **{retorno}**")
-        else:
-            st.error("ERRO: Preencha o nome do paciente para continuar.")
+    st.markdown("#### 👤 Atendimento")
+    with st.container():
+        nome = st.text_input("NOME DO PACIENTE:").upper()
+        dose = st.selectbox("DOSE DO ESQUEMA:", v_info["doses"])
+        
+        if st.button("🚀 REGISTRAR E APRAZAR"):
+            if nome:
+                retorno = (datetime.now() + timedelta(days=v_info['ret'])).strftime("%d/%m/%Y") if v_info['ret'] > 0 else "CONCLUÍDO"
+                st.info("✅ Registro processado com sucesso.")
+                st.markdown(f"""
+                ---
+                **Paciente:** {nome}  
+                **Status:** {dose} aplicada  
+                **Próximo Retorno:** `{retorno}`
+                """)
+            else:
+                st.error("⚠️ Identificação obrigatória.")
 
 st.markdown("---")
-st.caption("Base de dados atualizada conforme normativas do Ministério da Saúde 2026.")
+st.caption("Base normativa atualizada • Ministério da Saúde 2026")
