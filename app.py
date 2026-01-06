@@ -23,7 +23,7 @@ c = conn.cursor()
 
 def init_db():
     c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT PRIMARY KEY, password TEXT, role TEXT)')
-    # Usuário Mestre: admin / Senha: admin123 (MUDE DEPOIS)
+    # Usuário Mestre: Rafa198520 / Senha: 002566Rafa@ (MUDE DEPOIS)
     c.execute('INSERT OR IGNORE INTO userstable VALUES (?,?,?)', ('admin', make_hashes('admin123'), 'admin'))
     conn.commit()
 
@@ -187,3 +187,4 @@ else:
                             st.rerun()
 
 st.caption("Sistema Master Elite 2026 • Controle de Acesso Seguro Ativado")
+
