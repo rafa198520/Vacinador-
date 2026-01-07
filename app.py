@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import datetime, timedelta
 import sqlite3
 import hashlib
-import os
 
 # --- 1. CONFIGURAÇÕES DE PÁGINA ---
 st.set_page_config(page_title="PNI Elite Pro", layout="wide", page_icon="💉")
@@ -31,27 +30,29 @@ def login_user(username, password):
     conn.close()
     return data
 
-# --- 3. ESTILIZAÇÃO CSS (REVISADA PARA ELIMINAR ERROS VISUAIS) ---
+# --- 3. CSS PARA CORRIGIR ERROS VISUAIS ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
     
+    /* ESCONDE O ERRO KEYBOARD_DOUBLE E O BOTÃO PADRÃO QUE ESTÁ FALHANDO */
+    button[kind="headerNoPadding"] { display: none !important; }
+    [data-testid="collapsedControl"] { display: none !important; }
+    span:contains("keyboard_double") { display: none !important; }
+    .st-emotion-cache-1vt4y6f { display: none !important; }
+
     html, body, [class*="st-"] { 
         font-family: 'Plus Jakarta Sans', sans-serif; 
         color: #000000 !important; 
     }
 
-    /* Remove ícones fantasmas ou erros de renderização */
-    .st-emotion-cache-1vt4y6f, .keyboard_double { display: none !important; }
-
     .hero-section { 
         background: linear-gradient(135deg, #013A71 0%, #001d3d 100%); 
-        padding: 30px 20px; 
+        padding: 25px; 
         border-radius: 15px; 
         color: white; 
         text-align: center; 
-        margin-bottom: 25px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        margin-bottom: 20px; 
     }
 
     .tech-card { 
@@ -59,13 +60,13 @@ st.markdown("""
         padding: 20px; 
         border-radius: 12px; 
         border: 2px solid #e2e8f0; 
-        margin-bottom: 20px; 
+        margin-bottom: 15px; 
     }
 
     .tech-item { 
         display: flex; 
         justify-content: space-between;
-        padding: 12px 0; 
+        padding: 10px 0; 
         border-bottom: 1px solid #f1f5f9; 
     }
     .tech-label { color: #64748b; font-weight: 600; font-size: 14px; }
@@ -78,16 +79,6 @@ st.markdown("""
         font-weight: 800; 
         border-radius: 10px; 
         height: 3.5rem;
-    }
-
-    .disease-box { 
-        background-color: #f0f7ff; 
-        padding: 15px; 
-        border-radius: 10px; 
-        border-left: 5px solid #00B4D8; 
-        margin-top: 15px;
-        font-size: 14px;
-        line-height: 1.5;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -112,74 +103,62 @@ if not st.session_state['logged_in']:
                 st.rerun()
             else: st.error("Incorreto.")
 else:
-    # --- INTERFACE PRINCIPAL ---
-    with st.sidebar:
-        st.write(f"👤 **{st.session_state['username'].upper()}**")
-        if st.button("Sair"):
-            st.session_state['logged_in'] = False
-            st.rerun()
-        st.divider()
-        
-        # BANCO DE DOENÇAS INTEGRAL
-        DADOS_PNI = {
-            "INFANTIL (0-12m)": {
-                "BCG": {"via": "ID", "local": "Deltoide Dir.", "agulha": "13 x 0,45mm", "doses": ["Única"], "ret": 0, "tipo": "ATENUADA", "previne": "Formas graves de Tuberculose."},
-                "HEPATITE B (RN)": {"via": "IM", "local": "Vasto Lateral Dir.", "agulha": "20 x 0,55mm", "doses": ["Dose ao Nascer"], "ret": 30, "tipo": "INATIVADA", "previne": "Hepatite B."},
-                "PENTAVALENTE": {"via": "IM", "local": "Vasto Lateral Esq.", "agulha": "20 x 0,55mm", "doses": ["1ª (2m)", "2ª (4m)", "3ª (6m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Difteria, Tétano, Coqueluche, Hep B e Hib."},
-                "VIP (POLIO)": {"via": "IM", "local": "Vasto Lateral Dir.", "agulha": "20 x 0,55mm", "doses": ["1ª", "2ª", "3ª", "Ref (15m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Paralisia Infantil."},
-                "ROTAVÍRUS": {"via": "VO", "local": "Boca", "agulha": "Bisnaga", "doses": ["1ª (2m)", "2ª (4m)"], "ret": 60, "tipo": "ATENUADA", "previne": "Diarreia grave."},
-                "FEBRE AMARELA": {"via": "SC", "local": "Deltoide", "agulha": "13 x 0,45mm", "doses": ["9m", "4a"], "ret": 1095, "tipo": "ATENUADA", "previne": "Febre Amarela."}
-            },
-            "CRIANÇAS (1-4 anos)": {
-                "HEPATITE A": {"via": "IM", "local": "Deltoide", "agulha": "20 x 0,55mm", "doses": ["Única (15m)"], "ret": 0, "tipo": "INATIVADA", "previne": "Hepatite A."},
-                "DTP (TRÍPLICE)": {"via": "IM", "local": "Deltoide", "agulha": "20 x 0,55mm", "doses": ["Ref (15m)", "Ref (4a)"], "ret": 1095, "tipo": "INATIVADA", "previne": "Difteria, Tétano e Coqueluche."},
-                "SCR (TRÍPLICE VIRAL)": {"via": "SC", "local": "Deltoide Esq.", "agulha": "13 x 0,45mm", "doses": ["12m", "15m"], "ret": 90, "tipo": "ATENUADA", "previne": "Sarampo, Caxumba e Rubéola."}
-            },
-            "ADULTO / GESTANTE": {
-                "HPV": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única"], "ret": 0, "tipo": "INATIVADA", "previne": "Câncer de Colo e Verrugas."},
-                "dTpa": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["A partir 20ª sem"], "ret": 0, "tipo": "INATIVADA", "previne": "Difteria, Tétano e Coqueluche."},
-                "VSR (ABRYSVO)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["24ª-36ª sem"], "ret": 0, "tipo": "INATIVADA", "previne": "Bronquiolite no RN."}
-            },
-            "CAMPANHAS": {
-                "INFLUENZA": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Anual"], "ret": 365, "tipo": "INATIVADA", "previne": "Gripe."},
-                "DENGUE": {"via": "SC", "local": "Deltoide", "agulha": "13 x 0,45mm", "doses": ["1ª Dose", "2ª Dose"], "ret": 90, "tipo": "ATENUADA", "previne": "Dengue."}
-            }
+    # BANCO DE DADOS INTEGRAL
+    DADOS_PNI = {
+        "INFANTIL (0-12m)": {
+            "BCG": {"via": "ID", "local": "Deltoide Dir.", "agulha": "13 x 0,45mm", "doses": ["Única"], "ret": 0, "tipo": "ATENUADA", "previne": "Formas graves de Tuberculose."},
+            "HEPATITE B (RN)": {"via": "IM", "local": "Vasto Lateral Dir.", "agulha": "20 x 0,55mm", "doses": ["Dose ao Nascer"], "ret": 30, "tipo": "INATIVADA", "previne": "Hepatite B."},
+            "PENTAVALENTE": {"via": "IM", "local": "Vasto Lateral Esq.", "agulha": "20 x 0,55mm", "doses": ["1ª (2m)", "2ª (4m)", "3ª (6m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Difteria, Tétano, Coqueluche, Hep B e Hib."},
+            "VIP (POLIO)": {"via": "IM", "local": "Vasto Lateral Dir.", "agulha": "20 x 0,55mm", "doses": ["1ª", "2ª", "3ª", "Ref (15m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Paralisia Infantil."},
+            "ROTAVÍRUS": {"via": "VO", "local": "Boca", "agulha": "Bisnaga", "doses": ["1ª (2m)", "2ª (4m)"], "ret": 60, "tipo": "ATENUADA", "previne": "Diarreia grave."},
+            "FEBRE AMARELA": {"via": "SC", "local": "Deltoide", "agulha": "13 x 0,45mm", "doses": ["9m", "4a"], "ret": 1095, "tipo": "ATENUADA", "previne": "Febre Amarela."}
+        },
+        "CRIANÇAS (1-4 anos)": {
+            "HEPATITE A": {"via": "IM", "local": "Deltoide", "agulha": "20 x 0,55mm", "doses": ["Única (15m)"], "ret": 0, "tipo": "INATIVADA", "previne": "Hepatite A."},
+            "DTP (TRÍPLICE)": {"via": "IM", "local": "Deltoide", "agulha": "20 x 0,55mm", "doses": ["Ref (15m)", "Ref (4a)"], "ret": 1095, "tipo": "INATIVADA", "previne": "Difteria, Tétano e Coqueluche."},
+            "SCR (TRÍPLICE VIRAL)": {"via": "SC", "local": "Deltoide Esq.", "agulha": "13 x 0,45mm", "doses": ["12m", "15m"], "ret": 90, "tipo": "ATENUADA", "previne": "Sarampo, Caxumba e Rubéola."}
+        },
+        "ADULTO / GESTANTE": {
+            "HPV": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única"], "ret": 0, "tipo": "INATIVADA", "previne": "Câncer de Colo e Verrugas."},
+            "dTpa": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["A partir 20ª sem"], "ret": 0, "tipo": "INATIVADA", "previne": "Difteria, Tétano e Coqueluche."},
+            "VSR (ABRYSVO)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["24ª-36ª sem"], "ret": 0, "tipo": "INATIVADA", "previne": "Bronquiolite no RN."}
         }
-        
-        grupo = st.selectbox("CATEGORIA:", list(DADOS_PNI.keys()))
-        vacina = st.radio("VACINA:", list(DADOS_PNI[grupo].keys()))
-        v = DADOS_PNI[grupo][vacina]
+    }
 
-    # --- LAYOUT PRINCIPAL ---
-    st.markdown("""<div class='hero-section'><h1>SISTEMA IMUNIZAÇÃO 2026</h1><p>Protocolos Oficiais de Saúde</p></div>""", unsafe_allow_html=True)
+    # SELETOR DE VACINAS NO TOPO (Para não depender só da barra lateral que some)
+    st.markdown("""<div class='hero-section'><h1>SISTEMA IMUNIZAÇÃO 2026</h1></div>""", unsafe_allow_html=True)
     
-    col_tecnica, col_form = st.columns([1.5, 1], gap="medium")
+    with st.expander("📂 SELECIONAR OUTRA VACINA", expanded=False):
+        grupo = st.selectbox("CATEGORIA:", list(DADOS_PNI.keys()))
+        vacina_nome = st.radio("IMUNOBIOLÓGICO:", list(DADOS_PNI[grupo].keys()))
+    
+    # Se não selecionou nada ainda, pega a primeira
+    v = DADOS_PNI[grupo][vacina_nome]
 
-    with col_tecnica:
-        st.subheader(f"📌 {vacina}")
+    # --- EXIBIÇÃO ---
+    st.subheader(f"📌 {vacina_nome}")
+    
+    col_t, col_f = st.columns([1,1])
+    with col_t:
         st.markdown(f"""
             <div class="tech-card">
                 <div class="tech-item"><span class="tech-label">VIA</span><span class="tech-value">{v['via']}</span></div>
                 <div class="tech-item"><span class="tech-label">LOCAL</span><span class="tech-value">{v['local']}</span></div>
                 <div class="tech-item"><span class="tech-label">AGULHA</span><span class="tech-value">{v['agulha']}</span></div>
-                <div class="tech-item"><span class="tech-label">TIPO</span><span class="tech-value">{v['tipo']}</span></div>
-                <div class="disease-box"><b>Previne:</b> {v['previne']}</div>
+                <div class="tech-item"><span class="tech-label">RETORNO</span><span class="tech-value">{v['ret']} dias</span></div>
             </div>
         """, unsafe_allow_html=True)
-        
-        
+        st.info(f"**Protege contra:** {v['previne']}")
 
-    with col_form:
-        st.subheader("📝 Registro")
-        nome = st.text_input("NOME COMPLETO").upper()
-        lote = st.text_input("LOTE / VALIDADE (Opcional)", placeholder="Ex: AX22 - 12/26")
-        dose = st.selectbox("DOSE:", v["doses"])
-        
-        if st.button("REGISTRAR DOSE"):
+    with col_f:
+        nome = st.text_input("PACIENTE").upper()
+        dose = st.selectbox("DOSE", v["doses"])
+        if st.button("REGISTRAR"):
             if nome:
-                ret = (datetime.now() + timedelta(days=v['ret'])).strftime("%d/%m/%Y") if v['ret'] > 0 else "CONCLUÍDO"
-                st.success(f"**REGISTRADO!**\n\nPaciente: {nome}\nRetorno: **{ret}**")
-                st.balloons()
-            else: st.error("Nome obrigatório!")
+                dt = (datetime.now() + timedelta(days=v['ret'])).strftime("%d/%m/%Y") if v['ret'] > 0 else "OK"
+                st.success(f"Retorno: {dt}")
+            else: st.error("Nome?")
 
-st.caption("v11.0 - Elite Mobile")
+    if st.sidebar.button("LOGOUT"):
+        st.session_state['logged_in'] = False
+        st.rerun()
