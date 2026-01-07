@@ -30,7 +30,7 @@ def login_user(username, password):
     conn.close()
     return data
 
-# --- 3. CSS "BLINDADO" (PC/CELULAR) ---
+# --- 3. CSS "BLINDADO" ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
@@ -39,7 +39,7 @@ st.markdown("""
     .hero-section { background: linear-gradient(135deg, #013A71 0%, #001d3d 100%); padding: 25px; border-radius: 12px; color: white; text-align: center; margin-bottom: 20px; }
     .tech-card { background: white; padding: 18px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 15px; box-shadow: 2px 2px 10px rgba(0,0,0,0.05); }
     .tech-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-    .tech-label { color: #64748b; font-weight: 600; font-size: 13px; }
+    .tech-label { color: #475569; font-weight: 600; font-size: 13px; }
     .tech-value { color: #000000; font-weight: 800; text-align: right; font-size: 15px; }
     .stButton > button { width: 100%; background: #013A71; color: white !important; font-weight: 800; border-radius: 10px; height: 3.5rem; border: none; }
     .quiz-container { background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
@@ -65,35 +65,49 @@ if not st.session_state['logged_in']:
                 st.rerun()
             else: st.error("Incorreto.")
 else:
-    # --- BANCO DE DADOS RESTAURADO ---
+    # --- BANCO DE DADOS INTEGRAL 2026 ---
     DADOS_PNI = {
-        "GESTANTES": {
-            "VSR (ABRYSVO)": {"via": "IM Profunda", "local": "Deltoide", "agulha": "25x0,6mm", "doses": ["Dose Única (28ª a 36ª sem)"], "ret": 0, "previne": "Bronquiolite e Pneumonia (VSR) no recém-nascido."},
-            "dTpa (Acelular)": {"via": "IM", "local": "Deltoide", "agulha": "25x0,6mm", "doses": ["A partir da 20ª sem"], "ret": 0, "previne": "Difteria, Tétano e Coqueluche."},
-            "Hepatite B": {"via": "IM", "local": "Deltoide", "agulha": "25x0,6mm", "doses": ["1ª Dose", "2ª Dose", "3ª Dose"], "ret": 30, "previne": "Hepatite B e transmissão vertical."}
+        "CALENDÁRIO INFANTIL (0-12 meses)": {
+            "BCG": {"via": "ID", "local": "Deltoide Direito", "agulha": "13 x 0,45mm", "doses": ["Dose Única"], "ret": 0, "tipo": "ATENUADA", "previne": "Formas graves de Tuberculose."},
+            "HEPATITE B (RN)": {"via": "IM", "local": "Vasto Lateral Dir.", "agulha": "20 x 0,55mm", "doses": ["Ao Nascer"], "ret": 30, "tipo": "INATIVADA", "previne": "Hepatite B."},
+            "PENTAVALENTE": {"via": "IM", "local": "Vasto Lateral Esq.", "agulha": "20 x 0,55mm", "doses": ["1ª (2m)", "2ª (4m)", "3ª (6m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Difteria, Tétano, Coqueluche, Hepatite B e Hib."},
+            "VIP (POLIO INJETÁVEL)": {"via": "IM", "local": "Vasto Lateral Dir.", "agulha": "20 x 0,55mm", "doses": ["1ª (2m)", "2ª (4m)", "3ª (6m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Poliomielite."},
+            "PNEUMO 10V": {"via": "IM", "local": "Vasto Lateral Dir.", "agulha": "20 x 0,55mm", "doses": ["1ª (2m)", "2ª (4m)", "Reforço (12m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Pneumonias e Meningites."},
+            "ROTAVÍRUS": {"via": "VO", "local": "Boca", "agulha": "Bisnaga", "doses": ["1ª (2m)", "2ª (4m)"], "ret": 60, "tipo": "ATENUADA", "previne": "Diarreia por Rotavírus."},
+            "MENINGOCÓCICA C": {"via": "IM", "local": "Vasto Lateral Esq.", "agulha": "20 x 0,55mm", "doses": ["1ª (3m)", "2ª (5m)", "Reforço (12m)"], "ret": 60, "tipo": "INATIVADA", "previne": "Meningite C."},
+            "FEBRE AMARELA": {"via": "SC", "local": "Deltoide", "agulha": "13 x 0,45mm", "doses": ["9 meses", "4 anos (Reforço)"], "ret": 1095, "tipo": "ATENUADA", "previne": "Febre Amarela."}
         },
-        "INFANTIL (0-12m)": {
-            "BCG": {"via": "ID", "local": "Deltoide Dir.", "agulha": "13x0,45mm", "doses": ["Dose Única"], "ret": 0, "previne": "Tuberculose Miliar e Meníngea."},
-            "PENTAVALENTE": {"via": "IM", "local": "Vasto Lat. Esq.", "agulha": "20x0,55mm", "doses": ["1ª (2m)", "2ª (4m)", "3ª (6m)"], "ret": 60, "previne": "Difteria, Tétano, Coqueluche, Hep B e Hib."},
-            "VIP (Pólio)": {"via": "IM", "local": "Vasto Lat. Dir.", "agulha": "20x0,55mm", "doses": ["1ª (2m)", "2ª (4m)", "3ª (6m)"], "ret": 60, "previne": "Paralisia Infantil (Poliomielite)."},
-            "ROTAVÍRUS": {"via": "VO", "local": "Boca", "agulha": "Bisnaga", "doses": ["1ª (2m)", "2ª (4m)"], "ret": 60, "previne": "Diarreia grave por Rotavírus."}
+        "CALENDÁRIO CRIANÇAS (1-4 anos)": {
+            "HEPATITE A": {"via": "IM", "local": "Deltoide/Vasto", "agulha": "20 x 0,55mm", "doses": ["Dose Única (15m)"], "ret": 0, "tipo": "INATIVADA", "previne": "Hepatite A."},
+            "DTP (TRÍPLICE INFANTIL)": {"via": "IM", "local": "Deltoide/Vasto", "agulha": "20 x 0,55mm", "doses": ["Ref (15m)", "Ref (4 anos)"], "ret": 1095, "tipo": "INATIVADA", "previne": "Difteria, Tétano e Coqueluche."},
+            "TRÍPLICE VIRAL (SCR)": {"via": "SC", "local": "Deltoide Esq.", "agulha": "13 x 0,45mm", "doses": ["12 meses", "15 meses"], "ret": 90, "tipo": "ATENUADA", "previne": "Sarampo, Caxumba e Rubéola."},
+            "VARICELA": {"via": "SC", "local": "Deltoide Esq.", "agulha": "13 x 0,45mm", "doses": ["15 meses", "4 anos"], "ret": 1095, "tipo": "ATENUADA", "previne": "Varicela (Catapora)."}
         },
-        "ADULTO / IDOSO": {
-            "HPV": {"via": "IM", "local": "Deltoide", "agulha": "25x0,6mm", "doses": ["Dose Única"], "ret": 0, "previne": "Câncer de colo do útero e verrugas."},
-            "DENGUE (Qdenga)": {"via": "SC", "local": "Deltoide", "agulha": "13x0,45mm", "doses": ["1ª Dose", "2ª Dose"], "ret": 90, "previne": "Dengue (Sorotipos 1, 2, 3 e 4)."},
-            "INFLUENZA": {"via": "IM", "local": "Deltoide", "agulha": "25x0,6mm", "doses": ["Anual"], "ret": 365, "previne": "Gripe e complicações respiratórias."}
+        "ADULTO E ADOLESCENTE": {
+            "HPV QUADRIVALENTE": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única"], "ret": 0, "tipo": "INATIVADA", "previne": "Câncer e Verrugas genitais."},
+            "MENINGO ACWY": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única (11-14 anos)"], "ret": 0, "tipo": "INATIVADA", "previne": "Meningites A, C, W, Y."},
+            "dT (DUPLA ADULTO)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Reforço 10 em 10 anos"], "ret": 3650, "tipo": "INATIVADA", "previne": "Difteria e Tétano."},
+            "PNEUMO 23V": {"via": "IM/SC", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única"], "ret": 1825, "tipo": "INATIVADA", "previne": "Doenças Pneumocócicas."}
+        },
+        "CALENDÁRIO GESTANTES": {
+            "VSR (ABRYSVO)": {"via": "IM Profunda", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Dose Única (28ª a 36ª sem)"], "ret": 0, "tipo": "INATIVADA", "previne": "Bronquiolite no RN."},
+            "dTpa (ACELULAR)": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["A partir da 20ª sem"], "ret": 0, "tipo": "INATIVADA", "previne": "DTP no bebê."},
+            "HEPATITE B": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["3 doses"], "ret": 30, "tipo": "INATIVADA", "previne": "Hepatite B."}
+        },
+        "CAMPANHAS SAZONAIS": {
+            "INFLUENZA": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Anual"], "ret": 365, "tipo": "INATIVADA", "previne": "Gripe."},
+            "DENGUE (QDENGA)": {"via": "SC", "local": "Deltoide", "agulha": "13 x 0,45mm", "doses": ["1ª Dose", "2ª Dose"], "ret": 90, "tipo": "ATENUADA", "previne": "Dengue."},
+            "COVID-19 XBB": {"via": "IM", "local": "Deltoide", "agulha": "25 x 0,6mm", "doses": ["Anual"], "ret": 365, "tipo": "INATIVADA", "previne": "COVID-19."}
         }
     }
 
-    tab_pni, tab_quiz = st.tabs(["💉 SISTEMA VACINADOR", "🧠 SUPER QUIZ (40 QUESTÕES)"])
+    tab_vax, tab_quiz = st.tabs(["💉 SISTEMA VACINADOR", "🧠 SUPER QUIZ (40 QUESTÕES)"])
 
-    with tab_pni:
+    with tab_vax:
         st.markdown("<div class='hero-section'><h1>SISTEMA IMUNIZAÇÃO 2026</h1></div>", unsafe_allow_html=True)
-        
         c_sel1, c_sel2 = st.columns(2)
         with c_sel1: grupo = st.selectbox("GRUPO:", list(DADOS_PNI.keys()))
         with c_sel2: vacina_nome = st.selectbox("VACINA:", list(DADOS_PNI[grupo].keys()))
-        
         v = DADOS_PNI[grupo][vacina_nome]
         
         col_t, col_f = st.columns([1.5, 1], gap="large")
@@ -104,23 +118,20 @@ else:
                     <div class="tech-item"><span class="tech-label">VIA</span><span class="tech-value">{v['via']}</span></div>
                     <div class="tech-item"><span class="tech-label">LOCAL</span><span class="tech-value">{v['local']}</span></div>
                     <div class="tech-item"><span class="tech-label">AGULHA</span><span class="tech-value">{v['agulha']}</span></div>
-                    <div class="tech-item"><span class="tech-label">APRAZAMENTO</span><span class="tech-value">{v['ret']} dias</span></div>
+                    <div class="tech-item"><span class="tech-label">RETORNO</span><span class="tech-value">{v['ret']} dias</span></div>
                     <div class="disease-box"><b>🛡️ Previne:</b> {v['previne']}</div>
                 </div>
             """, unsafe_allow_html=True)
         with col_f:
             st.subheader("📝 Registro")
             nome_p = st.text_input("NOME DO PACIENTE").upper()
-            lote_p = st.text_input("LOTE/VALIDADE")
             dose_p = st.selectbox("DOSE:", v["doses"])
-            if st.button("REGISTRAR ATENDIMENTO"):
-                if nome_p: st.success(f"Registrado: {vacina_nome} para {nome_p}")
-                else: st.error("Informe o nome.")
+            if st.button("REGISTRAR DOSE"):
+                if nome_p: st.success(f"Registrado: {vacina_nome}")
+                else: st.error("Nome obrigatório.")
 
     with tab_quiz:
         st.markdown("## 🧠 Desafio Master: 40 Questões Técnicas")
-        st.write("Responda com atenção. Use a opção '-' para limpar a seleção.")
-
         perguntas = [
             ("Qual o período gestacional da VSR (Abrysvo)?", ["20-30 sem", "28-36 sem", "12-24 sem"], "28-36 sem"),
             ("Via e local da BCG?", ["SC/Esq", "ID/Dir", "IM/Coxa"], "ID/Dir"),
@@ -139,52 +150,38 @@ else:
             ("Local da Hepatite B ao nascer?", ["Vasto Lat. Dir", "Deltoide", "Glúteo"], "Vasto Lat. Dir"),
             ("Onde descartar agulhas e seringas?", ["Lixo comum", "Lixo infectante", "Descarpack"], "Descarpack"),
             ("Pneumo 10 é feita em qual via?", ["IM", "SC", "ID"], "IM"),
-            ("Qual a dose (volume) da BCG?", ["0,1 ml", "0,5 ml", "1,0 ml"], "0,1 ml"),
-            ("O que significa a sigla EAPV?", ["Exame de sangue", "Evento Adverso Pós-Vacinal", "Escala de dor"], "Evento Adverso Pós-Vacinal"),
-            ("Vacinas obrigatórias ao recém-nascido?", ["Penta", "BCG e HepB", "Febre Amarela"], "BCG e HepB"),
-            ("Novo esquema HPV 2024/2026?", ["Dose Única", "2 doses", "3 doses"], "Dose Única"),
-            ("Músculo local da Pentavalente?", ["Deltoide", "Vasto Lateral Esq", "Vasto Lateral Dir"], "Vasto Lateral Esq"),
+            ("Dose (volume) da BCG?", ["0,1 ml", "0,5 ml", "1,0 ml"], "0,1 ml"),
+            ("O que significa a sigla EAPV?", ["Exame", "Evento Adverso Pós-Vacinal", "Escala"], "Evento Adverso Pós-Vacinal"),
+            ("Vacinas ao recém-nascido?", ["Penta", "BCG e HepB", "Febre Amarela"], "BCG e HepB"),
+            ("Esquema HPV atual?", ["Dose Única", "2 doses", "3 doses"], "Dose Única"),
+            ("Músculo da Pentavalente?", ["Deltoide", "Vasto Lateral Esq", "Vasto Lateral Dir"], "Vasto Lateral Esq"),
             ("SCR protege contra?", ["Sarampo, Caxumba, Rubéola", "Sífilis", "Catapora"], "Sarampo, Caxumba, Rubéola"),
-            ("Meningo C é feita aos?", ["3 e 5 meses", "2 e 4 meses", "Ao nascer"], "3 e 5 meses"),
-            ("Pneumo 10 é feita aos?", ["2 e 4 meses", "3 e 5 meses", "Ao nascer"], "2 e 4 meses"),
-            ("Reforço da DTP (Tríplice Infantil)?", ["15 meses e 4 anos", "10 anos", "6 meses"], "15 meses e 4 anos"),
-            ("Idade da Hepatite A (PNI)?", ["15 meses", "12 meses", "2 anos"], "15 meses"),
-            ("Idade da Varicela no PNI?", ["15 meses e 4 anos", "Ao nascer", "10 anos"], "15 meses e 4 anos"),
-            ("Febre Amarela em idoso (>60 anos)?", ["Sempre faz", "Avaliação médica", "Nunca faz"], "Avaliação médica"),
-            ("Gestante pode fazer vacina atenuada?", ["Sim", "Não (Contraindicado)", "Apenas no 1º mês"], "Não (Contraindicado)"),
-            ("Volume da dose da Influenza?", ["0,1 ml", "0,5 ml", "1,0 ml"], "0,5 ml"),
-            ("A vacina dT (Dupla Adulto) protege contra?", ["Difteria e Tétano", "Dengue", "Diarreia"], "Difteria e Tétano"),
-            ("Validade do reforço da dT?", ["Anual", "10 em 10 anos", "Única"], "10 em 10 anos"),
-            ("Soro Antitetânico é considerado...", ["Vacina", "Imunidade Passiva", "Atenuada"], "Imunidade Passiva"),
-            ("Via da vacina Varicela?", ["IM", "SC", "ID"], "SC"),
-            ("VOP (gotinha) foi substituída por?", ["VIP (injetável)", "Rotavírus", "Penta"], "VIP (injetável)"),
-            ("Febre Amarela protege contra?", ["Formas urbana e silvestre", "Dengue", "Malária"], "Formas urbana e silvestre"),
-            ("Vacina que causa nódulo e supuração natural?", ["Penta", "BCG", "Influenza"], "BCG"),
-            ("Via da vacina COVID-19 (XBB)?", ["IM", "SC", "Oral"], "IM"),
-            ("Dose padrão da Hepatite B (ml)?", ["0,1 ml", "0,5 ml", "1,0 ml"], "0,5 ml")
+            ("Meningo C doses?", ["3 e 5 meses", "2 e 4 meses", "Nascer"], "3 e 5 meses"),
+            ("Pneumo 10 doses?", ["2 e 4 meses", "3 e 5 meses", "Nascer"], "2 e 4 meses"),
+            ("Reforço DTP?", ["15 meses e 4 anos", "10 anos", "6 meses"], "15 meses e 4 anos"),
+            ("Hepatite A idade?", ["15 meses", "12 meses", "2 anos"], "15 meses"),
+            ("Varicela PNI?", ["15 meses e 4 anos", "Nascer", "10 anos"], "15 meses e 4 anos"),
+            ("Febre Amarela > 60 anos?", ["Faz", "Avaliação médica", "Nunca"], "Avaliação médica"),
+            ("Gestante e Atenuada?", ["Sim", "Não", "Só no 1º mês"], "Não"),
+            ("Volume Influenza?", ["0,1 ml", "0,5 ml", "1,0 ml"], "0,5 ml"),
+            ("dT protege contra?", ["Difteria/Tétano", "Dengue", "Gripe"], "Difteria/Tétano"),
+            ("Reforço dT?", ["Anual", "10 em 10 anos", "5 anos"], "10 em 10 anos"),
+            ("Soro Antitetânico é...", ["Vacina", "Imunidade Passiva", "Atenuada"], "Imunidade Passiva"),
+            ("Via Varicela?", ["IM", "SC", "ID"], "SC"),
+            ("VOP substituída por?", ["VIP", "Rotavírus", "Penta"], "VIP"),
+            ("Febre Amarela protege contra?", ["Urbana/Silvestre", "Dengue", "Malária"], "Urbana/Silvestre"),
+            ("BCG causa supuração?", ["Não", "Sim (Natural)", "Apenas erro"], "Sim (Natural)"),
+            ("Via COVID (XBB)?", ["IM", "SC", "Oral"], "IM"),
+            ("Dose Hepatite B?", ["0,1 ml", "0,5 ml", "1,0 ml"], "0,5 ml")
         ]
-
         pontos = 0
         for i, (p, op, cor) in enumerate(perguntas):
             st.markdown(f"<div class='quiz-container'><b>{i+1}. {p}</b></div>", unsafe_allow_html=True)
-            esc = st.radio("Selecione:", ["-"] + op, key=f"q{i}", label_visibility="collapsed")
+            esc = st.radio("Escolha:", ["-"] + op, key=f"q{i}", label_visibility="collapsed")
             if esc == cor: pontos += 1
+        if st.button("📊 FINALIZAR"):
+            st.progress(pontos/40); st.success(f"Nota: {(pontos/40)*100}%")
 
-        st.divider()
-        if st.button("📊 FINALIZAR DESAFIO 40Q"):
-            perc = (pontos / 40) * 100
-            st.progress(pontos / 40)
-            st.markdown(f"<div class='score-banner'><h2>Nota Final: {perc:.1f}%</h2><h3>Acertos: {pontos} de 40</h3></div>", unsafe_allow_html=True)
-            if pontos == 40: 
-                st.balloons(); st.snow(); st.success("🏆 EXCELENTE! Você é um Vacinador Especialista!")
-            elif pontos >= 30: 
-                st.balloons(); st.warning("👏 ÓTIMO DESEMPENHO! Continue assim.")
-            else: 
-                st.error("📚 É PRECISO REVISAR. Consulte o manual da Rede de Frio e do PNI.")
-
-    st.markdown("<br>")
-    if st.button("🚪 SAIR DO SISTEMA"):
+    if st.button("🚪 SAIR"):
         st.session_state['logged_in'] = False
         st.rerun()
-
-st.caption("PNI Master Elite 2026 - v16.0 (Integral)")
